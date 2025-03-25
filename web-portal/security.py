@@ -77,7 +77,9 @@ class SecurityManager:
         """Log information about the outgoing response."""
         if hasattr(g, 'request_id') and hasattr(g, 'request_start_time'):
             duration = datetime.datetime.now() - g.request_start_time
-            status_code = getattr(response, 'status_code', 500 if exception else 200)
+            from flask import request
+            # In teardown_request the response might not be available, so use a default
+            status_code = 500 if exception else 200
             
             audit_logger.info(
                 f"RESPONSE | ID: {g.request_id} | "

@@ -29,6 +29,16 @@ This architecture provides a clean separation of concerns, allowing the transact
 - Historical transaction data with analytics
 - Responsive design for desktop and mobile access
 
+### Security Features
+- **Field-level Encryption**: Sensitive transaction data (amount, terminal ID, merchant ID, raw message) is encrypted in the database
+- **Comprehensive Audit Logging**: All system activities are logged with timestamps, user IDs, and IP addresses
+- **Data Integrity Protection**: Transaction records include hash values to detect tampering
+- **Access Tracking**: Every data access is logged with timestamps and counts
+- **Security Headers**: HTTP security headers (CSP, HSTS, etc.) added to all responses
+- **CSRF Protection**: Cross-Site Request Forgery protection for all forms
+- **Secure Cookie Management**: Session cookies configured with secure flags
+- **Transaction Integrity Verification**: Methods to verify transaction data hasn't been altered
+
 ## System Requirements
 
 ### Transaction Processor
