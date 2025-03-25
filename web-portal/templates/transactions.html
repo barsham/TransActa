@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Transactions</h1>
+        <div class="d-flex">
+            <div class="me-2">
+                <select id="transaction-limit" class="form-select">
+                    <option value="50" selected>50 transactions</option>
+                    <option value="100">100 transactions</option>
+                    <option value="200">200 transactions</option>
+                    <option value="500">500 transactions</option>
+                </select>
+            </div>
+            <button id="refresh-transactions" class="btn btn-primary">
+                <i class="fas fa-sync-alt me-1"></i> Refresh
+            </button>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Transaction List</h5>
+        </div>
+        <div class="card-body p-0">
+            <div id="transactions-container">
+                <div class="text-center p-5">
+                    <div class="spinner-border" role="status"></div>
+                    <p class="mt-2">Loading transactions...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Transaction Types</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Message Type Indicators (MTI)</h6>
+                    <table class="table table-sm">
+                        <tr>
+                            <th>MTI</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td>0100</td>
+                            <td>Authorization Request</td>
+                        </tr>
+                        <tr>
+                            <td>0110</td>
+                            <td>Authorization Response</td>
+                        </tr>
+                        <tr>
+                            <td>0200</td>
+                            <td>Financial Transaction Request</td>
+                        </tr>
+                        <tr>
+                            <td>0210</td>
+                            <td>Financial Transaction Response</td>
+                        </tr>
+                        <tr>
+                            <td>0400</td>
+                            <td>Reversal Request</td>
+                        </tr>
+                        <tr>
+                            <td>0410</td>
+                            <td>Reversal Response</td>
+                        </tr>
+                        <tr>
+                            <td>0800</td>
+                            <td>Network Management Request</td>
+                        </tr>
+                        <tr>
+                            <td>0810</td>
+                            <td>Network Management Response</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h6>Response Codes</h6>
+                    <table class="table table-sm">
+                        <tr>
+                            <th>Code</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td>00</td>
+                            <td>Approved or completed successfully</td>
+                        </tr>
+                        <tr>
+                            <td>01</td>
+                            <td>Refer to card issuer</td>
+                        </tr>
+                        <tr>
+                            <td>05</td>
+                            <td>Do not honor</td>
+                        </tr>
+                        <tr>
+                            <td>14</td>
+                            <td>Invalid card number</td>
+                        </tr>
+                        <tr>
+                            <td>51</td>
+                            <td>Insufficient funds</td>
+                        </tr>
+                        <tr>
+                            <td>54</td>
+                            <td>Expired card</td>
+                        </tr>
+                        <tr>
+                            <td>91</td>
+                            <td>Issuer or switch inoperative</td>
+                        </tr>
+                        <tr>
+                            <td>96</td>
+                            <td>System malfunction</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Transactions page specific scripts -->
+<script src="{{ url_for('static', filename='js/transactions.js') }}"></script>
+{% endblock %}

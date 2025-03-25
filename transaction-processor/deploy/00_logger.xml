@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE logger PUBLIC "-//jPOS/jPOS Logger Configuration DTD 1.0//EN" 
+                       "http://jpos.org/dtd/logger.dtd">
+
+<!--
+  JPOS Logger Configuration
+  This configures the logging system for the transaction processor
+-->
+<logger name="Q2">
+    <!-- Console log -->
+    <log-listener class="org.jpos.util.SimpleLogListener">
+        <property name="prefix" value="[sillypostilion] " />
+    </log-listener>
+    
+    <!-- Rotating log file -->
+    <log-listener class="org.jpos.util.RotateLogListener">
+        <property name="prefix" value="sillypostilion" />
+        <property name="suffix" value=".log"/>
+        <property name="maxsize" value="10000000"/>
+        <property name="window" value="100" />
+        <property name="deep" value="true" />
+    </log-listener>
+    
+    <!-- Syslog for production environments -->
+    <!--
+    <log-listener class="org.jpos.util.SysLogListener">
+        <property name="facility" value="21" />
+        <property name="severity" value="5" />
+        <property name="host" value="localhost" />
+        <property name="port" value="514" />
+    </log-listener>
+    -->
+</logger>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE q2 PUBLIC "-//jPOS/jPOS Q2 Configuration DTD 1.0//EN" 
+                    "http://jpos.org/dtd/q2.dtd">
+
+<!-- 
+  Channel Configuration
+  Configures the ISO channel for AS2805 communication
+-->
+<q2>
+    <!-- TCP/IP Server -->
+    <server class="com.sillypostilion.server.TransactionServer" name="as2805-server">
+        <property name="port" value="8000" />
+        <property name="max-sessions" value="100" />
+        <property name="channel-name" value="as2805-channel" />
+        <property name="packager" value="org.jpos.iso.packager.GenericPackager" />
+        <property name="packager-config" value="packager/as2805.xml" />
+    </server>
+</q2>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE q2 PUBLIC "-//jPOS/jPOS Q2 Configuration DTD 1.0//EN" 
+                    "http://jpos.org/dtd/q2.dtd">
+
+<!-- 
+  Transaction Manager Configuration
+  Configures the transaction processor and related components
+-->
+<q2>
+    <!-- Transaction Processor -->
+    <mbean class="com.sillypostilion.processor.TransactionProcessor" name="transaction-processor">
+        <property name="db-url" value="jdbc:h2:file:./sillypostilion;AUTO_SERVER=TRUE" />
+        <property name="db-user" value="sa" />
+        <property name="db-password" value="" />
+    </mbean>
+</q2>

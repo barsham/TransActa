@@ -1,0 +1,163 @@
+/* Custom CSS for SillyPostilion Web Portal */
+
+/* Main color scheme */
+:root {
+    --primary-color: #4a6fa5;
+    --secondary-color: #6f42c1;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --dark-color: #343a40;
+    --light-color: #f8f9fa;
+}
+
+/* Basic styling */
+body {
+    padding-top: 56px;
+}
+
+/* Sidebar */
+.sidebar {
+    position: fixed;
+    top: 56px;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    padding: 48px 0 0;
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+}
+
+.sidebar .nav-link {
+    font-weight: 500;
+    color: var(--dark-color);
+}
+
+.sidebar .nav-link.active {
+    color: var(--primary-color);
+}
+
+.sidebar .nav-link:hover {
+    color: var(--secondary-color);
+}
+
+/* Main content */
+.main-content {
+    padding-top: 20px;
+}
+
+/* Dashboard cards */
+.dashboard-card {
+    margin-bottom: 20px;
+    border-radius: 0.25rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.dashboard-card .card-header {
+    background-color: rgba(0, 0, 0, 0.03);
+    font-weight: bold;
+}
+
+/* Transaction table */
+.transaction-table th {
+    font-weight: 600;
+    background-color: var(--dark-color);
+    color: var(--light-color);
+}
+
+/* Status badges */
+.badge.bg-success {
+    background-color: var(--success-color) !important;
+}
+
+.badge.bg-danger {
+    background-color: var(--danger-color) !important;
+}
+
+.badge.bg-warning {
+    background-color: var(--warning-color) !important;
+}
+
+.badge.bg-info {
+    background-color: var(--info-color) !important;
+}
+
+.badge.bg-secondary {
+    background-color: var(--dark-color) !important;
+}
+
+/* Dashboard metrics */
+.metric-card {
+    text-align: center;
+    padding: 15px;
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.metric-label {
+    color: var(--dark-color);
+    font-size: 0.9rem;
+}
+
+/* Animation for loading indicator */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.spinner-border {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    vertical-align: text-bottom;
+    border: 0.25em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spin .75s linear infinite;
+}
+
+/* Footer */
+.footer {
+    margin-top: 30px;
+    padding: 20px 0;
+    border-top: 1px solid #e9ecef;
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+/* Transaction details modal */
+.transaction-details-modal .modal-header {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Code formatting for raw message */
+pre {
+    border-radius: 0.25rem;
+    font-family: monospace;
+    font-size: 0.85rem;
+}
+
+/* System status indicators */
+.system-status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.system-status-indicator.online {
+    background-color: var(--success-color);
+}
+
+.system-status-indicator.offline {
+    background-color: var(--danger-color);
+}
+
+.system-status-indicator.warning {
+    background-color: var(--warning-color);
+}
