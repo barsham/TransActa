@@ -1,0 +1,56 @@
+[
+  {
+    "mti": "0220",
+    "processing_code": "000000",
+    "amount": "000000983122",
+    "transmission_datetime": "0325222228",
+    "stan": "837396",
+    "terminal_id": "POS0348",
+    "merchant_id": "SHOP987",
+    "card_number": "4497210308508861",
+    "rrn": "714793125661"
+  },
+  {
+    "mti": "0400",
+    "processing_code": "000000",
+    "amount": "000000875642",
+    "transmission_datetime": "0325222228",
+    "stan": "561554",
+    "terminal_id": "TERM1931",
+    "merchant_id": "MERCH157",
+    "card_number": "4955837155087455",
+    "original_data": {
+      "original_mti": "0200",
+      "original_stan": "243329",
+      "original_datetime": "0325222228"
+    }
+  },
+  {
+    "mti": "0100",
+    "processing_code": "000000",
+    "amount": "000000333047",
+    "transmission_datetime": "0325222228",
+    "stan": "995445",
+    "terminal_id": "POS1199",
+    "merchant_id": "VENDOR545",
+    "card_number": "4438544374836073"
+  },
+  {
+    "mti": "0800",
+    "processing_code": "990000",
+    "transmission_datetime": "0325222228",
+    "stan": "440409",
+    "network_management_code": "301"
+  },
+  {
+    "mti": "0220",
+    "processing_code": "000000",
+    "amount": "000000069528",
+    "transmission_datetime": "0325222228",
+    "stan": "967587",
+    "terminal_id": "KIOSK1390",
+    "merchant_id": "VENDOR638",
+    "card_number": "4520072098057324",
+    "rrn": "089421967637"
+  }
+]
