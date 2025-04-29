@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="mb-4">
+        <h1>Generate HSM Key</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}">Admin</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('admin.hsm_keys') }}">HSM Keys</a></li>
+                <li class="breadcrumb-item active">Generate Key</li>
+            </ol>
+        </nav>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Generate New HSM Key</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('admin.generate_hsm_key') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Key Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                            <div class="form-text">A descriptive name for this key.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="2"></textarea>
+                            <div class="form-text">Additional details about this key's purpose.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="key_type" class="form-label">Key Type</label>
+                            <select class="form-select" id="key_type" name="key_type" required>
+                                <option value="" disabled selected>Select key type</option>
+                                {% for key_type in key_types %}
+                                    <option value="{{ key_type.name }}">{{ key_type.value }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">The type of cryptographic key to generate.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="key_length" class="form-label">Key Length (bits)</label>
+                            <select class="form-select" id="key_length" name="key_length">
+                                <option value="128">128 bits</option>
+                                <option value="192">192 bits</option>
+                                <option value="256" selected>256 bits</option>
+                            </select>
+                            <div class="form-text">The length of the cryptographic key. Longer keys provide better security.</div>
+                        </div>
+                        
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="software_fallback" name="software_fallback" checked>
+                            <label class="form-check-label" for="software_fallback">
+                                Use software fallback if HSM is unavailable
+                            </label>
+                            <div class="form-text">If enabled, keys will be generated using secure software methods when the HSM is unreachable.</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('admin.hsm_keys') }}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-key me-1"></i> Generate Key
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">About HSM Keys</h5>
+                </div>
+                <div class="card-body">
+                    <p>Hardware Security Module (HSM) keys are cryptographic keys stored in a secure hardware device. These keys are used for:</p>
+                    <ul>
+                        <li><strong>PIN Encryption Keys (PEK)</strong> - Used to encrypt and decrypt PINs.</li>
+                        <li><strong>Terminal Master Keys (TMK)</strong> - Used to secure communication with payment terminals.</li>
+                        <li><strong>Zone Master Keys (ZMK)</strong> - Used for secure key exchange between different security zones.</li>
+                        <li><strong>Message Authentication Keys (MAC)</strong> - Used to generate and verify message authentication codes.</li>
+                        <li><strong>Base Derivation Keys (BDK)</strong> - Root keys for DUKPT (Derived Unique Key Per Transaction) implementations.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Security Recommendations</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <i class="fas fa-shield-alt text-primary me-2"></i>
+                            Use 256-bit keys for maximum security
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-sync-alt text-primary me-2"></i>
+                            Rotate keys regularly (every 6-12 months)
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-key text-primary me-2"></i>
+                            Use different keys for different functions
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-user-shield text-primary me-2"></i>
+                            Limit access to key management functions
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

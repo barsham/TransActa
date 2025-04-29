@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>HSM Key Management</h1>
+        <div>
+            <a href="{{ url_for('admin.generate_hsm_key') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i> Generate New Key
+            </a>
+            <a href="{{ url_for('admin.import_hsm_key') }}" class="btn btn-outline-primary ms-2">
+                <i class="fas fa-file-import me-1"></i> Import Key
+            </a>
+        </div>
+    </div>
+    
+    <!-- Key Type Filter -->
+    <div class="card mb-4">
+        <div class="card-body p-3">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="show-expired" value="true">
+                        <label class="form-check-label" for="show-expired">Show Expired Keys</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex justify-content-md-end">
+                        <select id="key-type-filter" class="form-select form-select-sm" style="width: auto;">
+                            <option value="all">All Key Types</option>
+                            <option value="PEK">PIN Encryption Keys</option>
+                            <option value="TMK">Terminal Master Keys</option>
+                            <option value="ZMK">Zone Master Keys</option>
+                            <option value="MAC">MAC Keys</option>
+                            <option value="BDK">Base Derivation Keys</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- HSM Keys Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">HSM Keys</h5>
+        </div>
+        <div class="card-body">
+            {% if hsm_keys %}
+                <div class="table-responsive">
+                    <table class="table table-hover" id="hsm-keys-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Check Value</th>
+                                <th>Created</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for key in hsm_keys %}
+                            <tr data-key-type="{{ key.key_type }}" class="{% if key.expired %}text-muted{% endif %}">
+                                <td>
+                                    <div>{{ key.name }}</div>
+                                    <small class="text-muted">{{ key.description }}</small>
+                                </td>
+                                <td>{{ key.key_type }}</td>
+                                <td><code>{{ key.check_value }}</code></td>
+                                <td>{{ key.created_at|date }}</td>
+                                <td>
+                                    {% if key.expired %}
+                                        <span class="badge bg-danger">Expired</span>
+                                        {% if key.rotation_date %}
+                                            <div><small>Rotated: {{ key.rotation_date|date }}</small></div>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="key-action-{{ key.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Actions
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="key-action-{{ key.id }}">
+                                            <li><a class="dropdown-item" href="{{ url_for('admin.view_hsm_key', key_id=key.id) }}">View Details</a></li>
+                                            {% if not key.expired %}
+                                                <li><a class="dropdown-item" href="{{ url_for('admin.rotate_hsm_key', key_id=key.id) }}">Rotate Key</a></li>
+                                                <li><a class="dropdown-item" href="{{ url_for('admin.export_hsm_key', key_id=key.id) }}">Export Key</a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#expire-key-modal" data-key-id="{{ key.id }}" data-key-name="{{ key.name }}">Expire Key</a></li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state text-center py-5">
+                    <img src="{{ url_for('static', filename='images/empty-state.svg') }}" class="empty-state-icon mb-3" alt="No HSM keys">
+                    <h4>No HSM Keys Configured</h4>
+                    <p class="empty-state-text">No HSM keys have been configured yet.</p>
+                    <a href="{{ url_for('admin.generate_hsm_key') }}" class="btn btn-primary mt-3">
+                        <i class="fas fa-plus me-1"></i> Generate First Key
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Expire Key Confirmation Modal -->
+<div class="modal fade" id="expire-key-modal" tabindex="-1" aria-labelledby="expire-key-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="expire-key-modal-label">Confirm Key Expiration</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to expire the key <strong id="expire-key-name"></strong>?</p>
+                <p class="text-danger">This action cannot be undone. The key will no longer be usable for cryptographic operations.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="expire-key-form" method="post" action="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger">Expire Key</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- HSM Key Management specific script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Key type filtering
+        const keyTypeFilter = document.getElementById('key-type-filter');
+        const showExpiredCheckbox = document.getElementById('show-expired');
+        const tableRows = document.querySelectorAll('#hsm-keys-table tbody tr');
+        
+        // Function to filter the table
+        function filterTable() {
+            const keyType = keyTypeFilter.value;
+            const showExpired = showExpiredCheckbox.checked;
+            
+            tableRows.forEach(row => {
+                const rowKeyType = row.getAttribute('data-key-type');
+                const isExpired = row.querySelector('.badge.bg-danger') !== null;
+                
+                let showRow = true;
+                
+                // Filter by key type
+                if (keyType !== 'all' && rowKeyType !== keyType) {
+                    showRow = false;
+                }
+                
+                // Filter by status
+                if (!showExpired && isExpired) {
+                    showRow = false;
+                }
+                
+                row.style.display = showRow ? '' : 'none';
+            });
+        }
+        
+        // Apply filters when changed
+        keyTypeFilter.addEventListener('change', filterTable);
+        showExpiredCheckbox.addEventListener('change', filterTable);
+        
+        // Expire key modal handling
+        const expireKeyModal = document.getElementById('expire-key-modal');
+        
+        expireKeyModal.addEventListener('show.bs.modal', function (event) {
+            // Button that triggered the modal
+            const button = event.relatedTarget;
+            // Extract info from data-* attributes
+            const keyId = button.getAttribute('data-key-id');
+            const keyName = button.getAttribute('data-key-name');
+            
+            // Update the modal content
+            const keyNameElement = document.getElementById('expire-key-name');
+            keyNameElement.textContent = keyName;
+            
+            // Update form action
+            const form = document.getElementById('expire-key-form');
+            form.action = `/admin/hsm-keys/${keyId}/expire`;
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h1 class="mb-4">Admin Dashboard</h1>
+    
+    <div class="row">
+        <!-- System Settings Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">System Settings</h5>
+                    <a href="{{ url_for('admin.settings') }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-cog me-1"></i> Manage
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">Transaction Processor</h6>
+                                <small class="text-muted">Connection URL</small>
+                            </div>
+                            <span id="processor-url">{{ settings.transaction_processor_url }}</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">Log Level</h6>
+                                <small class="text-muted">Current logging level</small>
+                            </div>
+                            <span class="badge bg-secondary">{{ settings.log_level }}</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">Session Timeout</h6>
+                                <small class="text-muted">Inactivity period</small>
+                            </div>
+                            <span>{{ settings.session_timeout }} minutes</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">System Mode</h6>
+                                <small class="text-muted">Current operation mode</small>
+                            </div>
+                            {% if settings.maintenance_mode %}
+                                <span class="badge bg-warning">Maintenance</span>
+                            {% elif settings.offline_mode %}
+                                <span class="badge bg-danger">Offline</span>
+                            {% else %}
+                                <span class="badge bg-success">Online</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- HSM Keys Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">HSM Keys</h5>
+                    <a href="{{ url_for('admin.hsm_keys') }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-key me-1"></i> Manage
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if hsm_keys %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Check Value</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for key in hsm_keys[:5] %}
+                                    <tr>
+                                        <td>{{ key.name }}</td>
+                                        <td>{{ key.key_type }}</td>
+                                        <td><code>{{ key.check_value }}</code></td>
+                                        <td>
+                                            {% if key.expired %}
+                                                <span class="badge bg-danger">Expired</span>
+                                            {% else %}
+                                                <span class="badge bg-success">Active</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% if hsm_keys|length > 5 %}
+                            <div class="text-center mt-2">
+                                <small class="text-muted">{{ hsm_keys|length - 5 }} more keys available</small>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="empty-state text-center py-4">
+                            <img src="{{ url_for('static', filename='images/empty-state.svg') }}" class="empty-state-icon" alt="No HSM keys">
+                            <h4>No HSM Keys Configured</h4>
+                            <p class="empty-state-text">No HSM keys have been configured yet. Click the Manage button to add your first key.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Endpoints Card -->
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Connection Endpoints</h5>
+                    <a href="{{ url_for('admin.endpoints') }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-network-wired me-1"></i> Manage
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if endpoints %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Protocol</th>
+                                        <th>Host</th>
+                                        <th>Port</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for endpoint in endpoints %}
+                                    <tr>
+                                        <td>{{ endpoint.name }}</td>
+                                        <td>{{ endpoint.endpoint_type }}</td>
+                                        <td>{{ endpoint.protocol }}</td>
+                                        <td>{{ endpoint.host }}</td>
+                                        <td>{{ endpoint.port }}</td>
+                                        <td>
+                                            {% if endpoint.enabled %}
+                                                <span class="badge bg-success">Enabled</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Disabled</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{{ url_for('admin.edit_endpoint', endpoint_id=endpoint.id) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="empty-state text-center py-4">
+                            <img src="{{ url_for('static', filename='images/empty-state.svg') }}" class="empty-state-icon" alt="No endpoints">
+                            <h4>No Endpoints Configured</h4>
+                            <p class="empty-state-text">No connection endpoints have been configured yet. Click the Manage button to add your first endpoint.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Admin Quick Actions -->
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('admin.generate_hsm_key') }}" class="btn btn-outline-primary w-100 py-3">
+                                <i class="fas fa-key fa-2x mb-2"></i>
+                                <div>Generate HSM Key</div>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('admin.add_endpoint') }}" class="btn btn-outline-primary w-100 py-3">
+                                <i class="fas fa-plug fa-2x mb-2"></i>
+                                <div>Add Endpoint</div>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('admin.user_management') }}" class="btn btn-outline-primary w-100 py-3">
+                                <i class="fas fa-users fa-2x mb-2"></i>
+                                <div>User Management</div>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('admin.audit_logs') }}" class="btn btn-outline-primary w-100 py-3">
+                                <i class="fas fa-file-alt fa-2x mb-2"></i>
+                                <div>Audit Logs</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Admin Dashboard specific script -->
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

@@ -1,5 +1,8 @@
 from datetime import datetime
 import logging
+import uuid
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 from app import db
 from flask import current_app
 
@@ -224,4 +227,91 @@ class SystemStatus(db.Model):
             'transactionsProcessed': self.transactions_processed,
             'lastUpdated': self.last_updated.isoformat() if self.last_updated else None,
             'access_count': self.access_count
+        }
+
+
+class User(UserMixin, db.Model):
+    """
+    User model for authentication and access control
+    """
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    username = db.Column(db.String(64), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(256))
+    is_admin = db.Column(db.Boolean, default=False)
+    is_active = db.Column(db.Boolean, default=True)
+    last_login = db.Column(db.DateTime, nullable=True)
+    login_count = db.Column(db.Integer, default=0)
+    failed_login_count = db.Column(db.Integer, default=0)
+    last_failed_login = db.Column(db.DateTime, nullable=True)
+    password_changed_at = db.Column(db.DateTime, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def __init__(self, **kwargs):
+        """Initialize user with password hashing and audit logging."""
+        # Extract and hash password if provided
+        if 'password' in kwargs:
+            self.set_password(kwargs.pop('password'))
+            
+        # Pass remaining fields to parent constructor
+        super(User, self).__init__(**kwargs)
+        
+        # Log creation
+        audit_logger.info(f"USER:CREATE | ID: {self.id} | Username: {self.username}")
+    
+    def set_password(self, password):
+        """Generate password hash and update the password_changed_at timestamp"""
+        self.password_hash = generate_password_hash(password)
+        self.password_changed_at = datetime.utcnow()
+        self.failed_login_count = 0  # Reset failed logins when password changes
+        audit_logger.info(f"USER:PASSWORD_CHANGE | ID: {self.id} | Username: {self.username}")
+    
+    def check_password(self, password):
+        """Check password against stored hash"""
+        result = check_password_hash(self.password_hash, password)
+        
+        if result:
+            # Reset failed login count on successful login
+            self.failed_login_count = 0
+        else:
+            # Increment failed login count
+            self.failed_login_count += 1
+            self.last_failed_login = datetime.utcnow()
+            audit_logger.warning(f"USER:FAILED_LOGIN | ID: {self.id} | Username: {self.username} | Count: {self.failed_login_count}")
+        
+        return result
+    
+    def log_login(self):
+        """Update login statistics"""
+        self.last_login = datetime.utcnow()
+        self.login_count += 1
+        audit_logger.info(f"USER:LOGIN | ID: {self.id} | Username: {self.username} | Count: {self.login_count}")
+    
+    def lock_account(self):
+        """Lock user account"""
+        self.is_active = False
+        audit_logger.warning(f"USER:ACCOUNT_LOCKED | ID: {self.id} | Username: {self.username}")
+    
+    def unlock_account(self):
+        """Unlock user account"""
+        self.is_active = True
+        self.failed_login_count = 0
+        audit_logger.info(f"USER:ACCOUNT_UNLOCKED | ID: {self.id} | Username: {self.username}")
+    
+    def __repr__(self):
+        return f"<User {self.username}>"
+    
+    def to_dict(self):
+        """Convert user to dictionary for JSON serialization"""
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email,
+            'is_admin': self.is_admin,
+            'is_active': self.is_active,
+            'last_login': self.last_login.isoformat() if self.last_login else None,
+            'login_count': self.login_count,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
         }

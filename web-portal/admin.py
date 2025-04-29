@@ -468,6 +468,27 @@ class AdminModule:
             if key.id == key_id:
                 return key
         return None
+        
+    def update_hsm_key(self, key_id: str, updates: Dict[str, Any]) -> bool:
+        """Update an existing HSM key"""
+        for i, key in enumerate(self.hsm_keys):
+            if key.id == key_id:
+                # Update fields
+                for field, value in updates.items():
+                    if hasattr(key, field):
+                        setattr(key, field, value)
+                
+                self.hsm_keys[i] = key
+                
+                # Save keys
+                result = self._save_hsm_keys()
+                if result:
+                    logger.info(f"Updated HSM key: {key.name} ({key.id})")
+                
+                return result
+        
+        logger.error(f"HSM key with ID {key_id} not found")
+        return False
     
     def update_settings(self, updates: Dict[str, Any]) -> bool:
         """Update system settings"""

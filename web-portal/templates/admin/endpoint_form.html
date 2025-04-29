@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="mb-4">
+        <h1>{{ 'Edit' if endpoint else 'Add' }} Endpoint</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}">Admin</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('admin.endpoints') }}">Endpoints</a></li>
+                <li class="breadcrumb-item active">{{ 'Edit' if endpoint else 'Add' }} Endpoint</li>
+            </ol>
+        </nav>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">{{ 'Edit' if endpoint else 'Add' }} Endpoint</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" action="{{ url_for('admin.edit_endpoint', endpoint_id=endpoint.id) if endpoint else url_for('admin.add_endpoint') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <!-- Basic Information -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="border-bottom pb-2">Basic Information</h5>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ endpoint.name if endpoint else '' }}" required>
+                        <div class="form-text">A descriptive name for the endpoint.</div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="endpoint_type" class="form-label">Endpoint Type</label>
+                        <select class="form-select" id="endpoint_type" name="endpoint_type" required>
+                            <option value="" disabled {% if not endpoint %}selected{% endif %}>Select endpoint type</option>
+                            {% for type in endpoint_types %}
+                                <option value="{{ type.value }}" {% if endpoint and endpoint.endpoint_type.value == type.value %}selected{% endif %}>{{ type.value|title }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">The type of service this endpoint connects to.</div>
+                    </div>
+                    
+                    <div class="col-12 mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="2">{{ endpoint.description if endpoint else '' }}</textarea>
+                        <div class="form-text">Additional details about this endpoint.</div>
+                    </div>
+                </div>
+                
+                <!-- Connection Settings -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="border-bottom pb-2">Connection Settings</h5>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label for="protocol" class="form-label">Protocol</label>
+                        <select class="form-select" id="protocol" name="protocol" required>
+                            <option value="" disabled {% if not endpoint %}selected{% endif %}>Select protocol</option>
+                            {% for protocol in protocols %}
+                                <option value="{{ protocol.value }}" {% if endpoint and endpoint.protocol.value == protocol.value %}selected{% endif %}>{{ protocol.value|upper }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label for="host" class="form-label">Host</label>
+                        <input type="text" class="form-control" id="host" name="host" value="{{ endpoint.host if endpoint else '' }}" required>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label for="port" class="form-label">Port</label>
+                        <input type="number" class="form-control" id="port" name="port" value="{{ endpoint.port if endpoint else '' }}" min="1" max="65535" required>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="path" class="form-label">Path</label>
+                        <input type="text" class="form-control" id="path" name="path" value="{{ endpoint.path if endpoint else '' }}">
+                        <div class="form-text">Optional URL path (for HTTP-based protocols).</div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <label for="timeout" class="form-label">Timeout (seconds)</label>
+                        <input type="number" class="form-control" id="timeout" name="timeout" value="{{ endpoint.timeout if endpoint else 30 }}" min="1" max="300">
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <label for="retry_attempts" class="form-label">Retry Attempts</label>
+                        <input type="number" class="form-control" id="retry_attempts" name="retry_attempts" value="{{ endpoint.retry_attempts if endpoint else 3 }}" min="0" max="10">
+                    </div>
+                </div>
+                
+                <!-- Authentication -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="border-bottom pb-2">Authentication</h5>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="auth_method" class="form-label">Authentication Method</label>
+                        <select class="form-select" id="auth_method" name="auth_method">
+                            {% for method in auth_methods %}
+                                <option value="{{ method.value }}" {% if endpoint and endpoint.auth_method.value == method.value %}selected{% endif %}>{{ method.value|title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <div class="form-check form-switch mt-4">
+                            <input class="form-check-input" type="checkbox" id="ssl_verify" name="ssl_verify" {% if not endpoint or endpoint.ssl_verify %}checked{% endif %}>
+                            <label class="form-check-label" for="ssl_verify">Verify SSL Certificate</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Auth credentials fields - these will be shown/hidden based on auth method -->
+                    <div id="auth-credentials" class="col-12" style="display: {% if not endpoint or endpoint.auth_method.value == 'none' %}none{% endif %}">
+                        <!-- Basic auth -->
+                        <div id="basic-auth-fields" class="row" style="display: {% if endpoint and endpoint.auth_method.value == 'basic' %}flex{% else %}none{% endif %}">
+                            <div class="col-md-6 mb-3">
+                                <label for="basic_username" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="basic_username" name="auth_credentials[username]" value="{{ endpoint.auth_credentials.username if endpoint and 'username' in endpoint.auth_credentials else '' }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="basic_password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="basic_password" name="auth_credentials[password]" value="{{ endpoint.auth_credentials.password if endpoint and 'password' in endpoint.auth_credentials else '' }}">
+                            </div>
+                        </div>
+                        
+                        <!-- OAuth auth -->
+                        <div id="oauth-auth-fields" class="row" style="display: {% if endpoint and endpoint.auth_method.value == 'oauth' %}flex{% else %}none{% endif %}">
+                            <div class="col-md-6 mb-3">
+                                <label for="oauth_client_id" class="form-label">Client ID</label>
+                                <input type="text" class="form-control" id="oauth_client_id" name="auth_credentials[client_id]" value="{{ endpoint.auth_credentials.client_id if endpoint and 'client_id' in endpoint.auth_credentials else '' }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="oauth_client_secret" class="form-label">Client Secret</label>
+                                <input type="password" class="form-control" id="oauth_client_secret" name="auth_credentials[client_secret]" value="{{ endpoint.auth_credentials.client_secret if endpoint and 'client_secret' in endpoint.auth_credentials else '' }}">
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label for="oauth_token_url" class="form-label">Token URL</label>
+                                <input type="text" class="form-control" id="oauth_token_url" name="auth_credentials[token_url]" value="{{ endpoint.auth_credentials.token_url if endpoint and 'token_url' in endpoint.auth_credentials else '' }}">
+                            </div>
+                        </div>
+                        
+                        <!-- Certificate auth -->
+                        <div id="certificate-auth-fields" class="row" style="display: {% if endpoint and endpoint.auth_method.value == 'certificate' %}flex{% else %}none{% endif %}">
+                            <div class="col-md-6 mb-3">
+                                <label for="cert_path" class="form-label">Certificate Path</label>
+                                <input type="text" class="form-control" id="cert_path" name="auth_credentials[cert_path]" value="{{ endpoint.auth_credentials.cert_path if endpoint and 'cert_path' in endpoint.auth_credentials else '' }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="key_path" class="form-label">Key Path</label>
+                                <input type="text" class="form-control" id="key_path" name="auth_credentials[key_path]" value="{{ endpoint.auth_credentials.key_path if endpoint and 'key_path' in endpoint.auth_credentials else '' }}">
+                            </div>
+                        </div>
+                        
+                        <!-- HMAC auth -->
+                        <div id="hmac-auth-fields" class="row" style="display: {% if endpoint and endpoint.auth_method.value == 'hmac' %}flex{% else %}none{% endif %}">
+                            <div class="col-md-6 mb-3">
+                                <label for="hmac_key_id" class="form-label">Key ID</label>
+                                <input type="text" class="form-control" id="hmac_key_id" name="auth_credentials[key_id]" value="{{ endpoint.auth_credentials.key_id if endpoint and 'key_id' in endpoint.auth_credentials else '' }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="hmac_secret" class="form-label">Secret</label>
+                                <input type="password" class="form-control" id="hmac_secret" name="auth_credentials[secret]" value="{{ endpoint.auth_credentials.secret if endpoint and 'secret' in endpoint.auth_credentials else '' }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="hmac_algorithm" class="form-label">Algorithm</label>
+                                <select class="form-select" id="hmac_algorithm" name="auth_credentials[algorithm]">
+                                    <option value="SHA256" {% if endpoint and endpoint.auth_credentials.algorithm == 'SHA256' %}selected{% endif %}>SHA-256</option>
+                                    <option value="SHA512" {% if endpoint and endpoint.auth_credentials.algorithm == 'SHA512' %}selected{% endif %}>SHA-512</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Status -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="border-bottom pb-2">Status</h5>
+                    </div>
+                    
+                    <div class="col-12 mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="enabled" name="enabled" {% if not endpoint or endpoint.enabled %}checked{% endif %}>
+                            <label class="form-check-label" for="enabled">Endpoint Enabled</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Form buttons -->
+                <div class="row">
+                    <div class="col-12 d-flex justify-content-between">
+                        <a href="{{ url_for('admin.endpoints') }}" class="btn btn-secondary">Cancel</a>
+                        <div>
+                            {% if endpoint %}
+                                <a href="{{ url_for('admin.test_endpoint', endpoint_id=endpoint.id) }}" class="btn btn-outline-primary me-2">
+                                    <i class="fas fa-vial me-1"></i> Test Connection
+                                </a>
+                            {% endif %}
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> {{ 'Save Changes' if endpoint else 'Add Endpoint' }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Endpoint Form specific script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const authMethodSelect = document.getElementById('auth_method');
+        const authCredentialsDiv = document.getElementById('auth-credentials');
+        const basicAuthFields = document.getElementById('basic-auth-fields');
+        const oauthAuthFields = document.getElementById('oauth-auth-fields');
+        const certificateAuthFields = document.getElementById('certificate-auth-fields');
+        const hmacAuthFields = document.getElementById('hmac-auth-fields');
+        
+        // Handle auth method change
+        authMethodSelect.addEventListener('change', function() {
+            const selectedMethod = this.value;
+            
+            // Show/hide fields based on selected method
+            if (selectedMethod === 'none') {
+                authCredentialsDiv.style.display = 'none';
+            } else {
+                authCredentialsDiv.style.display = 'block';
+                
+                // Show only relevant fields
+                basicAuthFields.style.display = (selectedMethod === 'basic') ? 'flex' : 'none';
+                oauthAuthFields.style.display = (selectedMethod === 'oauth') ? 'flex' : 'none';
+                certificateAuthFields.style.display = (selectedMethod === 'certificate') ? 'flex' : 'none';
+                hmacAuthFields.style.display = (selectedMethod === 'hmac') ? 'flex' : 'none';
+            }
+        });
+        
+        // Protocol-specific logic
+        const protocolSelect = document.getElementById('protocol');
+        const pathField = document.getElementById('path');
+        const sslVerifyDiv = document.querySelector('#ssl_verify').closest('.form-check');
+        
+        protocolSelect.addEventListener('change', function() {
+            const selectedProtocol = this.value;
+            
+            // Show path field only for HTTP-based protocols
+            if (selectedProtocol === 'http' || selectedProtocol === 'https') {
+                pathField.closest('.col-md-6').style.display = 'block';
+            } else {
+                pathField.closest('.col-md-6').style.display = 'none';
+            }
+            
+            // Show SSL verify only for HTTPS
+            sslVerifyDiv.style.display = (selectedProtocol === 'https') ? 'block' : 'none';
+        });
+        
+        // Trigger changes for initial state
+        protocolSelect.dispatchEvent(new Event('change'));
+    });
+</script>
+{% endblock %}
