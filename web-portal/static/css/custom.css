@@ -12,6 +12,81 @@
     --light-color: #f8f9fa;
 }
 
+/* Logo styling */
+.navbar-logo {
+    height: 30px;
+    width: auto;
+}
+
+/* Transaction type icons */
+.transaction-icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+/* Empty state styling */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.empty-state-icon {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 20px;
+}
+
+.empty-state-text {
+    color: var(--bs-secondary);
+    font-size: 1.1rem;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Transaction type badges */
+.badge-mti {
+    font-family: monospace;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    display: inline-block;
+    min-width: 50px;
+    text-align: center;
+}
+
+.badge-mti.auth {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.badge-mti.financial {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.badge-mti.reversal {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.badge-mti.network {
+    background-color: var(--info-color);
+    color: white;
+}
+
+/* Transaction filter bar */
+.transaction-filter-bar {
+    background-color: var(--bs-dark);
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
 /* Basic styling */
 body {
     padding-top: 56px;

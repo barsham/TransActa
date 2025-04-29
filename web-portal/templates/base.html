@@ -16,13 +16,16 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.svg') }}" type="image/svg+xml">
 </head>
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">
-                <i class="fas fa-exchange-alt me-2"></i>
+                <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="SillyPostilion Logo" class="navbar-logo me-2">
                 SillyPostilion
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -46,10 +49,13 @@
                         </a>
                     </li>
                 </ul>
-                <div class="d-flex">
+                <div class="d-flex align-items-center">
                     <div class="navbar-text me-3">
                         <i class="fas fa-clock me-1"></i>
                         <span id="current-time">Loading...</span>
+                    </div>
+                    <div class="system-status-badge me-3" id="navbar-status-indicator">
+                        <span class="badge rounded-pill bg-danger">Offline</span>
                     </div>
                 </div>
             </div>

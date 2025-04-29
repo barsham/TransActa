@@ -49,28 +49,28 @@
                     <div class="row">
                         <div class="col-md-3 col-sm-6 metric-card">
                             <div class="metric-value text-success">
-                                <i class="fas fa-check-circle"></i>
+                                <img src="{{ url_for('static', filename='images/auth.svg') }}" class="transaction-icon" alt="Authorization Icon">
                                 <span id="approved-count">--</span>
                             </div>
                             <div class="metric-label">Approved Transactions</div>
                         </div>
                         <div class="col-md-3 col-sm-6 metric-card">
                             <div class="metric-value text-danger">
-                                <i class="fas fa-times-circle"></i>
+                                <img src="{{ url_for('static', filename='images/financial.svg') }}" class="transaction-icon" alt="Financial Icon">
                                 <span id="declined-count">--</span>
                             </div>
                             <div class="metric-label">Declined Transactions</div>
                         </div>
                         <div class="col-md-3 col-sm-6 metric-card">
                             <div class="metric-value text-warning">
-                                <i class="fas fa-undo-alt"></i>
+                                <img src="{{ url_for('static', filename='images/reversal.svg') }}" class="transaction-icon" alt="Reversal Icon">
                                 <span id="reversal-count">--</span>
                             </div>
                             <div class="metric-label">Reversals</div>
                         </div>
                         <div class="col-md-3 col-sm-6 metric-card">
                             <div class="metric-value text-info">
-                                <i class="fas fa-network-wired"></i>
+                                <img src="{{ url_for('static', filename='images/network.svg') }}" class="transaction-icon" alt="Network Icon">
                                 <span id="network-count">--</span>
                             </div>
                             <div class="metric-label">Network Messages</div>
@@ -90,9 +90,17 @@
                     <h5 class="card-title mb-0">Recent Transactions</h5>
                 </div>
                 <div class="card-body">
-                    <div class="text-center p-5">
+                    <div class="text-center p-5" id="loading-transactions">
                         <div class="spinner-border" role="status"></div>
                         <p class="mt-2">Loading recent transactions...</p>
+                    </div>
+                    <div class="empty-state" id="empty-transactions" style="display: none;">
+                        <img src="{{ url_for('static', filename='images/empty-state.svg') }}" class="empty-state-icon" alt="No transactions found">
+                        <h4>No Transactions Found</h4>
+                        <p class="empty-state-text">There are currently no transactions to display. Transactions will appear here once they are processed by the system.</p>
+                    </div>
+                    <div id="transactions-table-container" style="display: none;">
+                        <!-- Transactions table will be inserted here -->
                     </div>
                 </div>
             </div>
