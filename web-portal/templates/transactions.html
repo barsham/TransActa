@@ -19,15 +19,86 @@
         </div>
     </div>
     
+    <!-- Transaction Filter Bar -->
+    <div class="transaction-filter-bar mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-2 mb-2 mb-md-0">
+                <label for="filter-mti" class="form-label">Message Type:</label>
+                <select id="filter-mti" class="form-select">
+                    <option value="">All Types</option>
+                    <option value="01">Authorization (01xx)</option>
+                    <option value="02">Financial (02xx)</option>
+                    <option value="04">Reversal (04xx)</option>
+                    <option value="08">Network (08xx)</option>
+                </select>
+            </div>
+            <div class="col-md-2 mb-2 mb-md-0">
+                <label for="filter-response" class="form-label">Response:</label>
+                <select id="filter-response" class="form-select">
+                    <option value="">All Responses</option>
+                    <option value="00">Approved (00)</option>
+                    <option value="declined">Declined (Non-00)</option>
+                </select>
+            </div>
+            <div class="col-md-3 mb-2 mb-md-0">
+                <label for="filter-date" class="form-label">Date Range:</label>
+                <select id="filter-date" class="form-select">
+                    <option value="today">Today</option>
+                    <option value="yesterday">Yesterday</option>
+                    <option value="week" selected>Last 7 Days</option>
+                    <option value="month">Last 30 Days</option>
+                    <option value="all">All Time</option>
+                </select>
+            </div>
+            <div class="col-md-3 mb-2 mb-md-0">
+                <label for="search-term" class="form-label">Search:</label>
+                <input type="text" id="search-term" class="form-control" placeholder="Terminal ID, Merchant...">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button id="apply-filters" class="btn btn-primary w-100">
+                    <i class="fas fa-filter me-1"></i> Apply Filters
+                </button>
+            </div>
+        </div>
+    </div>
+    
     <div class="card mb-4">
         <div class="card-header">
             <h5 class="card-title mb-0">Transaction List</h5>
         </div>
         <div class="card-body p-0">
             <div id="transactions-container">
-                <div class="text-center p-5">
+                <div class="text-center p-5" id="loading-transactions">
                     <div class="spinner-border" role="status"></div>
                     <p class="mt-2">Loading transactions...</p>
+                </div>
+                <div class="empty-state" id="empty-transactions" style="display: none;">
+                    <img src="{{ url_for('static', filename='images/empty-state.svg') }}" class="empty-state-icon" alt="No transactions found">
+                    <h4>No Transactions Found</h4>
+                    <p class="empty-state-text">There are currently no transactions that match your search criteria. Try adjusting your filters or check back later.</p>
+                </div>
+                <div id="transactions-table-container" style="display: none;">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Transaction ID</th>
+                                <th>Time</th>
+                                <th>Amount</th>
+                                <th>Terminal ID</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactions-table-body">
+                            <!-- Transaction rows will be inserted here -->
+                        </tbody>
+                    </table>
+                    <nav aria-label="Transaction pagination" id="transaction-pagination">
+                        <ul class="pagination justify-content-center">
+                            <!-- Pagination will be inserted here -->
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>

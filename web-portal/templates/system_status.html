@@ -1,3 +1,7 @@
+{% block scripts %}
+<!-- System Status specific script -->
+<script src="{{ url_for('static', filename='js/system-status.js') }}"></script>
+{% endblock %}
 {% extends 'base.html' %}
 
 {% block content %}
@@ -6,13 +10,21 @@
     
     <!-- System Overview Card -->
     <div class="card mb-4">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0">System Overview</h5>
+            <button id="refresh-status" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-sync-alt me-1"></i> Refresh
+            </button>
         </div>
         <div class="card-body" id="system-overview">
-            <div class="text-center p-5">
+            <div class="text-center p-5" id="loading-system-status">
                 <div class="spinner-border" role="status"></div>
                 <p class="mt-2">Loading system information...</p>
+            </div>
+            <div class="empty-state" id="empty-system-status" style="display: none;">
+                <img src="{{ url_for('static', filename='images/empty-state.svg') }}" class="empty-state-icon" alt="System offline">
+                <h4>System Status Unavailable</h4>
+                <p class="empty-state-text">Unable to retrieve system status information. The system may be offline or experiencing connectivity issues.</p>
             </div>
         </div>
     </div>
@@ -80,6 +92,65 @@
         </div>
     </div>
     
+    <!-- System Metrics Card -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Transaction Metrics by Type</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <img src="{{ url_for('static', filename='images/auth.svg') }}" class="mb-3" alt="Authorization" style="width: 64px; height: 64px;">
+                            <h5>Authorizations</h5>
+                            <h3 id="auth-count">--</h3>
+                            <div class="progress">
+                                <div id="auth-progress" class="progress-bar bg-secondary" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <img src="{{ url_for('static', filename='images/financial.svg') }}" class="mb-3" alt="Financial" style="width: 64px; height: 64px;">
+                            <h5>Financial</h5>
+                            <h3 id="financial-count">--</h3>
+                            <div class="progress">
+                                <div id="financial-progress" class="progress-bar bg-primary" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <img src="{{ url_for('static', filename='images/reversal.svg') }}" class="mb-3" alt="Reversal" style="width: 64px; height: 64px;">
+                            <h5>Reversals</h5>
+                            <h3 id="reversal-count">--</h3>
+                            <div class="progress">
+                                <div id="reversal-progress" class="progress-bar bg-danger" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <img src="{{ url_for('static', filename='images/network.svg') }}" class="mb-3" alt="Network" style="width: 64px; height: 64px;">
+                            <h5>Network</h5>
+                            <h3 id="network-count">--</h3>
+                            <div class="progress">
+                                <div id="network-progress" class="progress-bar bg-info" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- System Logs -->
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
@@ -111,281 +182,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Load system status data
-        loadSystemStatus();
-        
-        // Set up refresh button for logs
-        document.getElementById('refresh-logs').addEventListener('click', function() {
-            loadSystemLogs();
-        });
-        
-        // Set up regular refresh
-        setInterval(loadSystemStatus, 10000);
-        
-        // Initialize transaction volume chart
-        initTransactionVolumeChart();
-    });
-    
-    function loadSystemStatus() {
-        // Fetch system status
-        fetch('/api/status')
-            .then(response => response.json())
-            .then(data => {
-                updateSystemOverview(data);
-                updateSystemHealth(data);
-                updateSidebarStatus(data);
-            })
-            .catch(error => {
-                console.error('Error fetching system status:', error);
-                document.getElementById('system-overview').innerHTML = 
-                    '<div class="alert alert-danger">Error loading system status</div>';
-                document.getElementById('system-health').innerHTML = 
-                    '<div class="alert alert-danger">Error loading system health</div>';
-            });
-            
-        // Load system logs (simulated as we don't have real logs)
-        loadSystemLogs();
-    }
-    
-    function updateSystemOverview(data) {
-        // Format timestamps
-        const startTime = data.startTime ? new Date(data.startTime).toLocaleString() : 'N/A';
-        const lastUpdated = data.lastUpdated ? new Date(data.lastUpdated).toLocaleString() : 'N/A';
-        
-        // Calculate uptime
-        let uptime = 'N/A';
-        if (data.startTime) {
-            const startTimeMs = new Date(data.startTime).getTime();
-            const now = new Date().getTime();
-            const uptimeMs = now - startTimeMs;
-            
-            // Format uptime
-            const seconds = Math.floor(uptimeMs / 1000) % 60;
-            const minutes = Math.floor(uptimeMs / (1000 * 60)) % 60;
-            const hours = Math.floor(uptimeMs / (1000 * 60 * 60)) % 24;
-            const days = Math.floor(uptimeMs / (1000 * 60 * 60 * 24));
-            
-            uptime = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-        }
-        
-        // Determine status badge class
-        let statusBadgeClass = 'bg-secondary';
-        if (data.status === 'RUNNING') {
-            statusBadgeClass = 'bg-success';
-        } else if (data.status === 'ERROR' || data.status === 'STOPPED') {
-            statusBadgeClass = 'bg-danger';
-        } else if (data.status === 'WARNING') {
-            statusBadgeClass = 'bg-warning';
-        }
-        
-        // Build overview HTML
-        const overviewHtml = `
-            <div class="row">
-                <div class="col-md-6">
-                    <h4><span class="badge ${statusBadgeClass}">${data.status || 'UNKNOWN'}</span></h4>
-                    <p class="mb-1"><strong>Start Time:</strong> ${startTime}</p>
-                    <p class="mb-1"><strong>Uptime:</strong> ${uptime}</p>
-                    <p class="mb-1"><strong>Last Updated:</strong> ${lastUpdated}</p>
-                </div>
-                <div class="col-md-6">
-                    <div class="d-flex align-items-center justify-content-center h-100">
-                        <div class="text-center">
-                            <h2 class="display-4">${data.transactionsProcessed || 0}</h2>
-                            <p class="text-muted">Transactions Processed</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        document.getElementById('system-overview').innerHTML = overviewHtml;
-    }
-    
-    function updateSystemHealth(data) {
-        // System health metrics
-        const isHealthy = data.status === 'RUNNING';
-        const memoryUsage = Math.floor(Math.random() * 40) + 30; // Simulated memory usage (30-70%)
-        const cpuUsage = Math.floor(Math.random() * 30) + 10; // Simulated CPU usage (10-40%)
-        const responseTime = Math.floor(Math.random() * 100) + 10; // Simulated response time (10-110ms)
-        
-        // Build health HTML
-        const healthHtml = `
-            <div class="row mb-4">
-                <div class="col-sm-6 col-md-4 text-center">
-                    <h5>CPU Usage</h5>
-                    <div class="progress mb-2" style="height: 20px;">
-                        <div class="progress-bar ${cpuUsage > 80 ? 'bg-danger' : cpuUsage > 60 ? 'bg-warning' : 'bg-success'}" 
-                             role="progressbar" style="width: ${cpuUsage}%;" 
-                             aria-valuenow="${cpuUsage}" aria-valuemin="0" aria-valuemax="100">
-                            ${cpuUsage}%
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-md-4 text-center">
-                    <h5>Memory Usage</h5>
-                    <div class="progress mb-2" style="height: 20px;">
-                        <div class="progress-bar ${memoryUsage > 80 ? 'bg-danger' : memoryUsage > 60 ? 'bg-warning' : 'bg-success'}" 
-                             role="progressbar" style="width: ${memoryUsage}%;" 
-                             aria-valuenow="${memoryUsage}" aria-valuemin="0" aria-valuemax="100">
-                            ${memoryUsage}%
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-md-4 text-center">
-                    <h5>Response Time</h5>
-                    <div class="progress mb-2" style="height: 20px;">
-                        <div class="progress-bar ${responseTime > 100 ? 'bg-danger' : responseTime > 50 ? 'bg-warning' : 'bg-success'}" 
-                             role="progressbar" style="width: ${Math.min(responseTime, 100)}%;" 
-                             aria-valuenow="${responseTime}" aria-valuemin="0" aria-valuemax="100">
-                            ${responseTime}ms
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <h5>System Checks</h5>
-                    <table class="table">
-                        <tr>
-                            <td><i class="fas fa-${isHealthy ? 'check text-success' : 'times text-danger'}"></i> Transaction Processor</td>
-                            <td><i class="fas fa-${isHealthy ? 'check text-success' : 'times text-danger'}"></i> Database Connection</td>
-                            <td><i class="fas fa-${isHealthy ? 'check text-success' : 'times text-danger'}"></i> API Server</td>
-                        </tr>
-                        <tr>
-                            <td><i class="fas fa-${isHealthy ? 'check text-success' : 'times text-danger'}"></i> Message Queue</td>
-                            <td><i class="fas fa-${isHealthy ? 'check text-success' : 'times text-danger'}"></i> ISO Channel</td>
-                            <td><i class="fas fa-${isHealthy ? 'check text-success' : 'times text-danger'}"></i> Logging System</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-        `;
-        
-        document.getElementById('system-health').innerHTML = healthHtml;
-    }
-    
-    function updateSidebarStatus(data) {
-        const sidebarStatus = document.getElementById('sidebar-status-indicator');
-        if (sidebarStatus) {
-            let statusClass = 'online';
-            let statusText = 'Online';
-            
-            if (data.status !== 'RUNNING') {
-                statusClass = data.status === 'WARNING' ? 'warning' : 'offline';
-                statusText = data.status === 'WARNING' ? 'Warning' : 'Offline';
-            }
-            
-            sidebarStatus.innerHTML = `
-                <span class="system-status-indicator ${statusClass}"></span>
-                ${statusText}
-            `;
-        }
-    }
-    
-    function loadSystemLogs() {
-        // Simulate system logs - in a real system, these would come from an API
-        const now = new Date();
-        const logs = [
-            {time: new Date(now - 1000 * 60 * 2), status: 'INFO', message: 'System status check completed'},
-            {time: new Date(now - 1000 * 60 * 15), status: 'INFO', message: 'Processed transaction batch #12345'},
-            {time: new Date(now - 1000 * 60 * 30), status: 'INFO', message: 'API server processed 50 requests'},
-            {time: new Date(now - 1000 * 60 * 45), status: 'WARNING', message: 'High response time detected'},
-            {time: new Date(now - 1000 * 60 * 60), status: 'INFO', message: 'Database cleanup completed'},
-            {time: new Date(now - 1000 * 60 * 120), status: 'INFO', message: 'System started successfully'}
-        ];
-        
-        // Build logs HTML
-        let logsHtml = '';
-        logs.forEach(log => {
-            const timeStr = log.time.toLocaleTimeString();
-            let statusClass = 'bg-info';
-            
-            if (log.status === 'ERROR') {
-                statusClass = 'bg-danger';
-            } else if (log.status === 'WARNING') {
-                statusClass = 'bg-warning';
-            } else if (log.status === 'SUCCESS') {
-                statusClass = 'bg-success';
-            }
-            
-            logsHtml += `
-                <tr>
-                    <td>${timeStr}</td>
-                    <td><span class="badge ${statusClass}">${log.status}</span></td>
-                    <td>${log.message}</td>
-                </tr>
-            `;
-        });
-        
-        document.getElementById('system-logs').innerHTML = logsHtml;
-    }
-    
-    function initTransactionVolumeChart() {
-        // Fetch transaction statistics
-        fetch('/api/stats')
-            .then(response => response.json())
-            .then(data => {
-                // Prepare chart data
-                const hours = [];
-                const counts = [];
-                
-                // Generate all hours (0-23) with zero counts
-                for (let i = 0; i < 24; i++) {
-                    hours.push(i.toString());
-                    counts.push(0);
-                }
-                
-                // Update with actual counts from data
-                if (data) {
-                    Object.entries(data).forEach(([hour, count]) => {
-                        if (!isNaN(parseInt(hour)) && parseInt(hour) >= 0 && parseInt(hour) < 24) {
-                            counts[parseInt(hour)] = count;
-                        }
-                    });
-                }
-                
-                // Create chart
-                const ctx = document.getElementById('hourly-transaction-chart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: hours.map(h => `${h}:00`),
-                        datasets: [{
-                            label: 'Transactions',
-                            data: counts,
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 2,
-                            pointBackgroundColor: 'rgba(75, 192, 192, 1)',
-                            tension: 0.4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    precision: 0
-                                }
-                            }
-                        },
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: 'Hourly Transaction Volume'
-                            }
-                        }
-                    }
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching transaction stats:', error);
-                document.getElementById('hourly-transaction-chart').innerHTML = 
-                    '<div class="alert alert-danger">Error loading transaction statistics</div>';
-            });
-    }
-</script>
+<!-- System Status specific script -->
+<script src="{{ url_for('static', filename='js/system-status.js') }}"></script>
 {% endblock %}
