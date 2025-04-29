@@ -80,6 +80,9 @@ register_routes(app)
 # Register admin blueprint
 app.register_blueprint(admin_bp)
 
+# Register auth blueprint
+app.register_blueprint(auth_bp)
+
 # Initialize security manager with app
 security_manager.init_app(app)
 

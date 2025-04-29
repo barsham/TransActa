@@ -1,7 +1,8 @@
 import requests
 import logging
 from datetime import datetime
-from flask import render_template, jsonify, request
+from flask import render_template, jsonify, request, redirect, url_for
+from flask_login import login_required, current_user
 from models import Transaction, SystemStatus, db
 
 # Configure logging
@@ -20,20 +21,25 @@ def register_routes(app):
     
     @app.route('/')
     def index():
-        """Render the dashboard page"""
+        """Render the dashboard page or redirect to login"""
+        if not current_user.is_authenticated:
+            return redirect(url_for('auth.login'))
         return render_template('index.html')
     
     @app.route('/transactions')
+    @login_required
     def transactions():
         """Render the transactions page"""
         return render_template('transactions.html')
     
     @app.route('/system-status')
+    @login_required
     def system_status():
         """Render the system status page"""
         return render_template('system_status.html')
     
     @app.route('/api/transactions')
+    @login_required
     def get_transactions():
         """Get transaction data from the transaction processor"""
         limit = request.args.get('limit', 50, type=int)
@@ -62,6 +68,7 @@ def register_routes(app):
             return jsonify(cached_transactions)
     
     @app.route('/api/status')
+    @login_required
     def get_status():
         """Get system status from the transaction processor"""
         try:
@@ -88,6 +95,7 @@ def register_routes(app):
             return jsonify(cached_status)
     
     @app.route('/api/stats')
+    @login_required
     def get_stats():
         """Get transaction statistics from the transaction processor"""
         try:
