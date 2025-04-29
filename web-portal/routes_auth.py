@@ -19,6 +19,24 @@ logger = logging.getLogger(__name__)
 # Create auth blueprint
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
+# Create default admin user if none exists
+def init_default_admin():
+    from models import User, db
+    admin = User.query.filter_by(username='admin').first()
+    if not admin:
+        admin = User(
+            username='admin',
+            email='admin@example.com',
+            password='administrator',  # At least 8 chars
+            is_admin=True,
+            is_active=True
+        )
+        db.session.add(admin)
+        db.session.commit()
+        logger.info("Created default admin user")
+
+init_default_admin()
+
 
 # Helper function to check if a URL is safe for redirects
 def is_safe_url(target):
