@@ -66,51 +66,51 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+            <nav class="col-md-2 d-none d-md-block bg-dark sidebar">
                 <div class="position-sticky pt-3">
                     <ul class="nav flex-column">
                         <li class="nav-item">
                             <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">
-                                <i class="fas fa-tachometer-alt me-2"></i>
-                                Dashboard
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>Dashboard</span>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {% if request.path == '/transactions' %}active{% endif %}" href="/transactions">
-                                <i class="fas fa-exchange-alt me-2"></i>
-                                Transactions
+                                <i class="fas fa-exchange-alt"></i>
+                                <span>Transactions</span>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {% if request.path == '/system-status' %}active{% endif %}" href="/system-status">
-                                <i class="fas fa-server me-2"></i>
-                                System Status
+                                <i class="fas fa-server"></i>
+                                <span>System Status</span>
                             </a>
                         </li>
                         <li class="nav-item mt-4">
-                            <div class="nav-link text-muted">
-                                <i class="fas fa-info-circle me-2"></i>
-                                System Info
+                            <div class="nav-link text-white-50 ps-3 fw-bold">
+                                <i class="fas fa-info-circle"></i>
+                                <span>System Info</span>
                             </div>
                         </li>
                         <li class="nav-item">
-                            <div class="nav-link">
-                                <span class="text-muted">Version:</span>
+                            <div class="nav-link text-white-50 ps-3">
+                                <span>Version:</span>
                                 <span class="float-end">1.0.0</span>
                             </div>
                         </li>
                         <li class="nav-item">
-                            <div class="nav-link">
-                                <span class="text-muted">Protocol:</span>
+                            <div class="nav-link text-white-50 ps-3">
+                                <span>Protocol:</span>
                                 <span class="float-end">AS2805</span>
                             </div>
                         </li>
                         <li class="nav-item">
-                            <div class="nav-link">
-                                <span class="text-muted">Status:</span>
+                            <div class="nav-link text-white-50 ps-3">
+                                <span>Status:</span>
                                 <span id="sidebar-status-indicator" class="float-end">
-                                    <span class="system-status-indicator online"></span>
-                                    Online
+                                    <span class="system-status-indicator offline"></span>
+                                    Offline
                                 </span>
                             </div>
                         </li>

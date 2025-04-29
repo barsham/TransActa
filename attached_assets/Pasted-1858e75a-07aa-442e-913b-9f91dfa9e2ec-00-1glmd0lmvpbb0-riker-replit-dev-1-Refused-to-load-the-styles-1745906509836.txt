@@ -1,0 +1,36 @@
+1858e75a-07aa-442e-913b-9f91dfa9e2ec-00-1glmd0lmvpbb0.riker.replit.dev/:1 Refused to load the stylesheet 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap' because it violates the following Content Security Policy directive: "style-src 'self' https://cdn.replit.com https://cdnjs.cloudflare.com". Note that 'style-src-elem' was not explicitly set, so 'style-src' is used as a fallback.
+
+1858e75a-07aa-442e-913b-9f91dfa9e2ec-00-1glmd0lmvpbb0.riker.replit.dev/:217 Refused to apply inline style because it violates the following Content Security Policy directive: "style-src 'self' https://cdn.replit.com https://cdnjs.cloudflare.com". Either the 'unsafe-inline' keyword, a hash ('sha256-biLFinpqYMtWHmXfkA1BPeCY0/fNt46SAZ+BBk5YUog='), or a nonce ('nonce-...') is required to enable inline execution. Note that hashes do not apply to event handlers, style attributes and javascript: navigations unless the 'unsafe-hashes' keyword is present.
+
+1858e75a-07aa-442e-913b-9f91dfa9e2ec-00-1glmd0lmvpbb0.riker.replit.dev/:222 Refused to apply inline style because it violates the following Content Security Policy directive: "style-src 'self' https://cdn.replit.com https://cdnjs.cloudflare.com". Either the 'unsafe-inline' keyword, a hash ('sha256-biLFinpqYMtWHmXfkA1BPeCY0/fNt46SAZ+BBk5YUog='), or a nonce ('nonce-...') is required to enable inline execution. Note that hashes do not apply to event handlers, style attributes and javascript: navigations unless the 'unsafe-hashes' keyword is present.
+
+1858e75a-07aa-442e-913b-9f91dfa9e2ec-00-1glmd0lmvpbb0.riker.replit.dev/:264 Refused to execute inline script because it violates the following Content Security Policy directive: "script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com". Either the 'unsafe-inline' keyword, a hash ('sha256-gvxNTIMAr4YWlqqMs4pih2KYWgf09ehM6uyF9TK+cNY='), or a nonce ('nonce-...') is required to enable inline execution.
+
+Refused to load the font '<URL>' because it violates the following Content Security Policy directive: "default-src 'self'". Note that 'font-src' was not explicitly set, so 'default-src' is used as a fallback.
+
+Refused to load the font '<URL>' because it violates the following Content Security Policy directive: "default-src 'self'". Note that 'font-src' was not explicitly set, so 'default-src' is used as a fallback.
+
+Refused to load the font '<URL>' because it violates the following Content Security Policy directive: "default-src 'self'". Note that 'font-src' was not explicitly set, so 'default-src' is used as a fallback.
+
+Refused to load the font '<URL>' because it violates the following Content Security Policy directive: "default-src 'self'". Note that 'font-src' was not explicitly set, so 'default-src' is used as a fallback.
+
+Refused to load the font '<URL>' because it violates the following Content Security Policy directive: "default-src 'self'". Note that 'font-src' was not explicitly set, so 'default-src' is used as a fallback.
+
+Refused to load the font '<URL>' because it violates the following Content Security Policy directive: "default-src 'self'". Note that 'font-src' was not explicitly set, so 'default-src' is used as a fallback.
+
+Refused to load the font '<URL>' because it violates the following Content Security Policy directive: "default-src 'self'". Note that 'font-src' was not explicitly set, so 'default-src' is used as a fallback.
+
+Refused to load the font '<URL>' because it violates the following Content Security Policy directive: "default-src 'self'". Note that 'font-src' was not explicitly set, so 'default-src' is used as a fallback.
+
+Refused to load the font '<URL>' because it violates the following Content Security Policy directive: "default-src 'self'". Note that 'font-src' was not explicitly set, so 'default-src' is used as a fallback.
+
+1858e75a-07aa-442e-913b-9f91dfa9e2ec-00-1glmd0lmvpbb0.riker.replit.dev/:286 Refused to execute inline script because it violates the following Content Security Policy directive: "script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com". Either the 'unsafe-inline' keyword, a hash ('sha256-QST0SsjOdm/sRbv14kWOjpG1WGGQBV8RY6Vljw5SvyE='), or a nonce ('nonce-...') is required to enable inline execution.
+
+1858e75a-07aa-442e-913b-9f91dfa9e2ec-00-1glmd0lmvpbb0.riker.replit.dev/:1 Refused to load the stylesheet 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap' because it violates the following Content Security Policy directive: "style-src 'self' https://cdn.replit.com https://cdnjs.cloudflare.com". Note that 'style-src-elem' was not explicitly set, so 'style-src' is used as a fallback.
+
+
+                
+          
+          
+          
+         Chrome is moving towards a new experience that allows users to choose to browse without third-party cookies.
