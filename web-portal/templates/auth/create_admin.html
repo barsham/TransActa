@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Create Admin - SillyPostilion{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-light text-center">
+                    <h4 class="mb-0">Create Admin Account</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('auth.create_admin') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i data-feather="user"></i></span>
+                                <input type="text" class="form-control" id="username" name="username" required autofocus>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i data-feather="mail"></i></span>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i data-feather="lock"></i></span>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                            </div>
+                            <div class="form-text">Password must be at least 8 characters long.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">Confirm Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i data-feather="lock"></i></span>
+                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Create Admin</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer bg-light text-center">
+                    <a href="{{ url_for('auth.login') }}" class="text-decoration-none">Go back to login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Initialize Feather icons
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
+    });
+</script>
+{% endblock %}

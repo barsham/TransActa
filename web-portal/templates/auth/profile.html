@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}User Profile - SillyPostilion{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>User Profile</h2>
+            <hr>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-light">
+                    <h5 class="mb-0">Profile Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="avatar-placeholder bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; border-radius: 50%;">
+                            <i data-feather="user" style="width: 30px; height: 30px;"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="mb-0">{{ current_user.username }}</h5>
+                            <p class="text-muted mb-0">{{ 'Admin' if current_user.is_admin else 'User' }}</p>
+                        </div>
+                    </div>
+                    
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Email:</dt>
+                        <dd class="col-sm-8">{{ current_user.email }}</dd>
+                        
+                        <dt class="col-sm-4">Last login:</dt>
+                        <dd class="col-sm-8">{{ current_user.last_login|default('Never', true)|datetime }}</dd>
+                        
+                        <dt class="col-sm-4">Login count:</dt>
+                        <dd class="col-sm-8">{{ current_user.login_count }}</dd>
+                        
+                        <dt class="col-sm-4">Account created:</dt>
+                        <dd class="col-sm-8">{{ current_user.created_at|datetime }}</dd>
+                    </dl>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('auth.password_change') }}" class="btn btn-primary">Change Password</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-light">
+                    <h5 class="mb-0">Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i data-feather="info" class="me-2"></i> Activity tracking will be implemented in a future update.
+                    </div>
+                </div>
+            </div>
+            
+            {% if current_user.is_admin %}
+            <div class="card">
+                <div class="card-header bg-dark text-light">
+                    <h5 class="mb-0">Admin Options</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <a href="{{ url_for('admin.index') }}" class="btn btn-outline-secondary w-100">
+                                <i data-feather="settings" class="me-2"></i> System Settings
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{{ url_for('admin.endpoints') }}" class="btn btn-outline-secondary w-100">
+                                <i data-feather="server" class="me-2"></i> Manage Endpoints
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{{ url_for('admin.hsm_keys') }}" class="btn btn-outline-secondary w-100">
+                                <i data-feather="key" class="me-2"></i> HSM Key Management
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="#" class="btn btn-outline-secondary w-100">
+                                <i data-feather="users" class="me-2"></i> User Management
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Initialize Feather icons
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
+    });
+</script>
+{% endblock %}

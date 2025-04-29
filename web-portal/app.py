@@ -71,6 +71,9 @@ from admin import get_admin_module
 # Import admin routes
 from routes_admin import admin_bp
 
+# Import auth routes
+from routes_auth import auth_bp
+
 # Register regular routes with the app
 register_routes(app)
 
